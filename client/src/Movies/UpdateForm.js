@@ -1,22 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import Movie from './Movie';
 
 const initialMovie = {
-    id: null,
     title: '',
     director: '',
-    metascore: null,
+    metascore: '',
     stars: []
 };
 
 const UpdateForm = props => {
     const [movie, setMovie] = useState(initialMovie);
-    
-    // useEffect(() => {
-    //     const id = props.match.params.id;
-        
-    // }, [props.match.params.id])
+    useEffect(() => {
+        const id = props.match.params.id;
+        const movieInList = props.movies.find(movie => `${movie.id}` === id);
+        if (movieInList) setMovie(movieInList);
+    }, [props.movies, props.match.params.id]);
 
     const changeHandler = event => {
         event.persist();
@@ -34,42 +32,45 @@ const UpdateForm = props => {
     const handleSubmit = event => {
         event.preventDefault();
         axios
-            .put
-    }
+            .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(error => console.log(error.response));
+    };
 
     return (
         <div>
             <h2>Update Movie</h2>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label>Title</label>
                 <input
                     type="text"
                     name="title"
                     onChange={changeHandler}
-                    // value={}
+                    value={movie.title}
                 />
                 <label>Director</label>
                 <input
                     type="text"
                     name="director"
                     onChange={changeHandler}
-                    // value={}
+                    value={movie.director}
                 />
                 <label>Metascore</label>
                 <input
                     type="number"
                     name="metascore"
                     onChange={changeHandler}
-                    // value={}
+                    value={movie.metascore}
                 />
                 <label>Stars</label>
                 
-                <input
+                {/* <input
                     type="text"
                     name="stars"
                     onChange={changeHandler}
-                    // value={}
-                />
+                /> */}
                 <button type="submit">Update</button>
             </form>
         </div>
