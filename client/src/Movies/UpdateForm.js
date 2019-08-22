@@ -35,6 +35,10 @@ const UpdateForm = props => {
             .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
             .then(res => {
                 console.log(res);
+                setMovie(initialMovie);
+                props.updateMovies(res.data);
+                props.history.push('/movies')
+
             })
             .catch(error => console.log(error.response));
     };
