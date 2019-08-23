@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const initialMovie = {
@@ -10,16 +10,22 @@ const initialMovie = {
 
 const UpdateForm = props => {
     const [movie, setMovie] = useState(initialMovie);
+    
+    const fetchMovie = id => {
+        axios
+          .get(`http://localhost:5000/api/movies/${id}`)
+          .then(res => setMovie(res.data))
+          .catch(err => console.log(err.response));
+    };
+    
     useEffect(() => {
-        const id = props.match.params.id;
-        const movieInList = props.movies.find(movie => `${movie.id}` === id);
-        if (movieInList) setMovie(movieInList);
-    }, [props.movies, props.match.params.id]);
+    fetchMovie(props.match.params.id);
+    }, [props.match.params.id]);
 
     const changeHandler = event => {
         event.persist();
         let value = event.target.value;
-        if (event.target === 'metascore'){
+        if (event.target === 'metascore') {
             value = parseInt(value, 10);
         }
 
@@ -41,6 +47,12 @@ const UpdateForm = props => {
 
             })
             .catch(error => console.log(error.response));
+    };
+
+    const starHandler = index => event => {
+        setMovie({...movie, stars: movie.stars.map((starName, starIndex) => {
+            return starIndex === index ? event.target.value : starName;
+        })});
     };
 
     return (
@@ -68,13 +80,15 @@ const UpdateForm = props => {
                     onChange={changeHandler}
                     value={movie.metascore}
                 />
-                <label>Stars</label>
-                
-                {/* <input
-                    type="text"
-                    name="stars"
-                    onChange={changeHandler}
-                /> */}
+                <label>Stars</label>9
+
+                {movie.stars.map((star, index) => (
+                    <input
+                        type="text"
+                        onChange={starHandler(index)}
+                        value={star} />
+                ))}
+
                 <button type="submit">Update</button>
             </form>
         </div>
